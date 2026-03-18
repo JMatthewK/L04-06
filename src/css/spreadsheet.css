@@ -1,1 +1,45 @@
 /* src/css/spreadsheet.css */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.page-header{
+    padding: 20px;
+}
+
+.subtitle{
+    font-size: 18px;
+    color: #555;
+}
+
+.column-headers {
+    background-color: #d0d0d0;
+    cursor: pointer;
+}
+
+.selected {
+    background-color: #e0e0ff;
+}
+
+#gradebook-container {
+    margin: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+#selection-summary {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#chart-container {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
