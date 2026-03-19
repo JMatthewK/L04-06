@@ -102,14 +102,14 @@ function createHeaderEvents(){
 function updateSummaryForRow(rowIndex){
     const matrix = gradesToMatrix(gradebookData);
     const values = getRow(matrix, rowIndex - 1);
-
+    updateChart(values)
     updateSummaryPanel("Row", gradebookData.students[rowIndex - 1], values);
 }
 
 function updateSummaryForColumn(colIndex) {
     const matrix = gradesToMatrix(gradebookData);
     const values = getColumn(matrix, colIndex);
-
+    updateChart(values)
     updateSummaryPanel("Column", gradebookData.assessments[colIndex], values);
 }
 
