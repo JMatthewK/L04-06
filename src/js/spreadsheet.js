@@ -1,43 +1,78 @@
 // src/js/spreadsheet.js
 // DOM generation + jQuery interactivity + editing + summary updates
 
-const sampleData = {
-    students: ["Ava", "Noah", "Mia", "Liam", "Zoe", "Ethan", "Ivy", "Sam", "Kai", "Emma"],
-    assessments: ["Lab 1", "Lab 2", "Lab 3", "Midterm", "Final"],
-    grades: [
-        [92, 85, 88, 79, 91],
-        [76, 81, 74, 69, 72],
-        [88, 90, 84, 93, 86],
-        [63, 58, 71, 66, 60],
-        [95, 92, 97, 89, 94],
-        [82, 77, 80, 74, 79],
-        [70, 73, 68, 72, 75],
-        [55, 61, 59, 63, 58],
-        [84, 86, 83, 81, 85],
-        [91, 88, 90, 87, 92]
-    ]
-};
+/*
+BUILDING TABLE WITH CSV DATA
+*/
+
+let gradebookData = null;
+
+$(document).ready(function (){
+    loadGrades().then(data =>{
+        gradebookData = data;
+        buildGradebookTable(data);
+        createHeaderEvents();
+        makeCellsEditable();
+    })
+})
+
+function buildGradebookTable(data){
+    const table = $("<table id='gradebook-table'></table>");
+    const headerRow = $("<tr></tr>");
+
+    // Empty top-left cell
+    headerRow.append("<th></th>");
+    data.assessments.forEach(label => {
+        headerRow.append(`<th class="column-header">${label}</th>`);
+    });
+    table.append(headerRow);
+
+    data.students.forEach((student, index) => {
+        const row = $("<tr></tr>");
+        row.append(`<th class="row-header">${student}</th>`);
+        data.grades[index].forEach((grade, colIndex) => {
+            row.append(
+                `<td data-row="${index}" data-col="${colIndex}">${grade}</td>`
+            );
+        });
+        table.append(row);
+    });
+
+    $("#gradebook-container").empty().append(table);
+}
 
 
+
+
+/*
+row and column selection functions
+*/
 
 // de-selects every cell in the gradebook by removing the selected class
 function deselectAll() {
     $('.selected').removeClass('selected');
 }
 
+//*TODO* UPDATE CHART WHENEVER YOU SELECT ROW OR COLUMN OR EDIT
+
 // selects every non-header cell in the specified row (indexed starting with zero) 
 function selectRow(rowIndex){
     deselectAll();
 
     // Skip the row header for the nth (rowIndex) row
-    $('gradebook-table tr:eq(${rowIndex}) td').addClass("selected");
+    $(`#gradebook-table tr:eq(${rowIndex}) td`).addClass("selected");
+    updateSummaryForRow(rowIndex)
 }
  
 // selects every non-header cell in the specified column (indexed starting with zero)  
 function selectColumn(colIndex){
     deselectAll();
 
-    $(this).find('td:eq(${colIndex - 1})').addClass("selected");
+    $("#gradebook-table tr:gt(0)").each(function () {
+        $(this).find(`td:eq(${colIndex})`).addClass("selected");
+    });
+
+    updateSummaryForColumn(colIndex)
 }
 
 // Event handlers for clicking the row and column headers
@@ -45,16 +80,16 @@ function selectColumn(colIndex){
 function createHeaderEvents(){
     // Column headers
     $("#gradebook-table th.column-header").each(function (colIndex){
-        $(this.on("click", function (){
+        $(this).on("click", function (){
             selectColumn(colIndex);
-        }));
+        });
     });
 
     // Row headers
     $("#gradebook-table th.row-header").each(function (rowIndex){
-        $(this.on("click", function (){
+        $(this).on("click", function (){
             selectRow(rowIndex + 1);
-        }));
+        });
     });
 }
 
@@ -64,18 +99,18 @@ function createHeaderEvents(){
 // mean average grade of the selection
 // min and max grade of selection
 
-function updateRowSummary(rowIndex){
-    const matrix = convertToMatrix(sampleData);
+function updateSummaryForRow(rowIndex){
+    const matrix = gradesToMatrix(gradebookData);
     const values = getRow(matrix, rowIndex - 1);
 
-    updateSummaryPanel("Row", sampleData.students[rowIndex - 1], values);
+    updateSummaryPanel("Row", gradebookData.students[rowIndex - 1], values);
 }
 
 function updateSummaryForColumn(colIndex) {
-    const matrix = convertToMatrix(sampleData);
-    const values = getColumn(matrix, colIndex - 1);
+    const matrix = gradesToMatrix(gradebookData);
+    const values = getColumn(matrix, colIndex);
 
-    updateSummaryPanel("Column", sampleData.assessments[colIndex - 1], values);
+    updateSummaryPanel("Column", gradebookData.assessments[colIndex], values);
 }
 
 // Function that both rows and columns use to update the summary panel
@@ -100,24 +135,51 @@ function updateSummaryPanel(type, label, values) {
 }
 
 // Code to make every non-header table cell editable
-
 function makeCellsEditable() {
-    // Select only td, not headers
-    $("#gradebook-table td").on("click", function () {
+    $("#gradebook-table").on("click", "td", function () {
         const cell = $(this);
-        const oldValue = cell.text();
 
-        // Replace with input
+        // Prevent double-editing
+        if (cell.find("input").length > 0) return;
+
+        const oldValue = cell.text().trim();
+        const row = parseInt(cell.attr("data-row"));
+        const col = parseInt(cell.attr("data-col"));
+
         cell.html(`<input type="text" class="edit-field" value="${oldValue}">`);
         const input = cell.find("input");
         input.focus();
 
-        // Save on ENTER
         input.on("keydown", function (e) {
             if (e.key === "Enter") {
                 const newValue = input.val().trim();
+                const numeric = parseFloat(newValue);
+
+                // Update UI
                 cell.text(newValue);
+
+                // Update the matrix
+                if (!isNaN(numeric)) {
+                    gradebookData.grades[row][col] = numeric;
+                } else {
+                    gradebookData.grades[row][col] = NaN;
+                }
+
+                // If a row/column is selected, refresh summary
+                const selectedRow = cell.closest("tr").index();
+                const selectedCol = cell.index();
+
+                if (cell.hasClass("selected")) {
+                    // Determine whether row or column is selected
+                    if (selectedCol > 0) {
+                        updateSummaryForColumn(selectedCol);
+                    }
+                    if (selectedRow > 0) {
+                        updateSummaryForRow(selectedRow);
+                    }
+                }
             }
         });
     });
 }
+

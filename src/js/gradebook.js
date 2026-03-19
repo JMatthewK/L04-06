@@ -8,8 +8,8 @@ DATA PARSING AND PROCESSING
 function loadGrades(){
     // Using fetch to load the CSV
     // Converting the text to a list using the comma delimiter
-    return fetch("../data/grades.csv")
-        .then(response => responde.text())
+    return fetch("../data/grades.csv") 
+        .then(response => response.text())
         .then(text => {
             // Each line is has the newline delimiter
             const lines = text.trim().split("\n");
@@ -89,10 +89,22 @@ function loadGradeData() {
     });
 }
 
-// Informal tests
-const matrix = gradesToMatrix(loadGrades());
+$(document).ready(function () {
+    loadGrades().then(data => {
+        gradebookData = data;
+        buildGradebookTable(data);
+        createHeaderEvents();
+        makeCellsEditable();
+    });
+});
 
-console.log("Row 0:", getRow(matrix, 0));
-console.log("Column 1:", getColumn(matrix, 1));
-console.log("Is grade cell (0,0)?", isGradeCell(0,0));
-console.log("Is grade cell (1,1)?", isGradeCell(1,1));
+
+// Informal tests
+loadGrades().then(data =>{
+    const matrix = gradesToMatrix(data);
+
+    console.log("Row 0:", getRow(matrix, 0));
+    console.log("Column 1:", getColumn(matrix, 1));
+    console.log("Is grade cell (0,0)?", isGradeCell(0,0));
+    console.log("Is grade cell (1,1)?", isGradeCell(1,1));
+})
