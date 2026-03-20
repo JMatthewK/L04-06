@@ -21,7 +21,7 @@ function buildGradebookTable(data){
     const headerRow = $("<tr></tr>");
 
     // Empty top-left cell
-    headerRow.append("<th></th>");
+    headerRow.append("<th class='blank-column-header'>Student</th>");
     data.assessments.forEach(label => {
         headerRow.append(`<th class="column-header">${label}</th>`);
     });

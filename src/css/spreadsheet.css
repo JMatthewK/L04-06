@@ -1,10 +1,28 @@
 /* src/css/spreadsheet.css */
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 .page-header{
-    padding: 20px;
+    padding: 30px 20px;
+    margin-bottom: 20px;
+    background-color: #10182b;
+}
+
+.page-header h1 {
+    font-size: 32px;
+    margin: 0;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+.page-header .subtitle {
+    font-size: 18px;
+    color: #666;
+    margin-top: 8px;
+    color: #FFFFFF;
 }
 
 .subtitle{
@@ -12,7 +30,16 @@ body {
     color: #555;
 }
 
-.column-headers {
+.column-header {
+    background-color: #d0d0d0;
+    cursor: pointer;
+}
+
+.blank-column-header {
+    background-color: #d0d0d0;
+}
+
+.row-header {
     background-color: #d0d0d0;
     cursor: pointer;
 }
@@ -26,6 +53,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
     overflow-x: auto;
+    width: 80%;
 }
 
 #selection-summary {
@@ -42,4 +70,9 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f9f9f9;
+}
+
+#gradebook-table {
+    width: 100%;
+    border-collapse: collapse;
 }
