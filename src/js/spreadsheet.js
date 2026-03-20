@@ -38,7 +38,7 @@ function buildGradebookTable(data){
         table.append(row);
     });
 
-    $("#gradebook-container").empty().append(table);
+    $("#gradebook-table").empty().append(table);
 }
 
 
