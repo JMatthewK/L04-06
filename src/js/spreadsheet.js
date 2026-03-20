@@ -13,6 +13,7 @@ $(document).ready(function (){
         buildGradebookTable(data);
         createHeaderEvents();
         makeCellsEditable();
+        updateSummaryPanel("None", "—", []);
     })
 })
 
@@ -115,22 +116,45 @@ function updateSummaryForColumn(colIndex) {
 
 // Function that both rows and columns use to update the summary panel
 function updateSummaryPanel(type, label, values) {
+    let count, mean, min, max;
+
     if (values.length === 0) {
-        $("#selection-summary-text").text("Nothing selected.");
-        return;
+        count = "—";
+        mean = "—";
+        min = "—";
+        max = "—";
+    } else {
+        count = values.length;
+        mean = (values.reduce((a, b) => a + b, 0) / count).toFixed(2);
+        min = Math.min(...values);
+        max = Math.max(...values);
     }
 
-    const count = values.length;
-    const mean = (values.reduce((a, b) => a + b, 0) / count).toFixed(2);
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-
     $("#selection-summary-text").html(`
-        <strong>${type}:</strong> ${label}<br>
-        Count: ${count}<br>
-        Mean: ${mean}<br>
-        Min: ${min}<br>
-        Max: ${max}
+        <div class="summary-box">
+            <p class="summary-box-header">Selected</p>
+            <strong>${type}: ${label}</strong>
+        </div>
+
+        <div class="summary-box">
+            <p class="summary-box-header">Count</p>
+            <strong>${count}</strong>
+        </div>
+
+        <div class="summary-box">
+            <p class="summary-box-header">Mean</p>
+            <strong>${mean}</strong>
+        </div>
+
+        <div class="summary-box">
+            <p class="summary-box-header">Min</p>
+            <strong>${min}</strong>
+        </div>
+
+        <div class="summary-box">
+            <p class="summary-box-header">Max</p>
+            <strong>${max}</strong>
+        </div>
     `);
 }
 

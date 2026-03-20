@@ -45,9 +45,9 @@ function updateChart(values){
 
     d3.select('#chart-container').selectAll("*").remove();
 
-    const width = 400;
+    const width = 800;
     const height = 250;
-    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+    const margin = { top: 20, right: 20, bottom: 40, left: 60 };
 
     const svg = d3.select("#chart-container")
         .append("svg")
@@ -85,5 +85,21 @@ function updateChart(values){
         .attr("y", d => y(d.value))
         .attr("width", x.bandwidth())
         .attr("height", d => (height - margin.bottom) - y(d.value))
-        .attr("fill", "#4a90e2");
+        .attr("fill", "#000000");
+
+    svg.append("text")
+        .attr("class", "x-label")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height - 5)
+        .text("Letter Grade");
+
+    svg.append("text")
+        .attr("class", "y-label")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", 15)
+        .text("Frequency");
+
 }
